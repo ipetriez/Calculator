@@ -22,6 +22,11 @@ struct CalculatorBrain {
             return true
         }
     }
+    var description = "" {
+        didSet {
+            print(description)
+        }
+    }
     
     private enum Operation {
         case constant(Double)
@@ -54,13 +59,16 @@ struct CalculatorBrain {
             switch operation {
             case .constant(let value):
                 accumulator = value
+                description += symbol
             case .unaryOperation(let function):
                 if accumulator != nil {
                     accumulator = function(accumulator!)
+                    description += symbol
                 }
             case .binaryOperation(let function):
-                if accumulator != 0 {
+                if accumulator != nil {
                     pendingBinaryOperation = PendingBinaryOperation(function: function, firstOperand: accumulator!)
+                    description += symbol
                 }
                 accumulator = nil
             case .memoryOperation:
@@ -95,6 +103,12 @@ struct CalculatorBrain {
     
     mutating func setOperand(_ operand: Double) {
         accumulator = operand
+        if Double(String(operand)) == Double(String(Int(operand))) {
+            description += String(Int(operand))
+        } else {
+            description += String(operand)
+        }
+        
     }
     
     var result: Double? {

@@ -63,7 +63,23 @@ struct CalculatorBrain {
             case .unaryOperation(let function):
                 if accumulator != nil {
                     accumulator = function(accumulator!)
-                    description += symbol
+                    if pendingBinaryOperation == nil, symbol != "x²" {
+                        let tempDescription = "(\(description))"
+                        description = tempDescription
+                        description.insert(contentsOf: symbol, at: description.startIndex)
+                    } else if pendingBinaryOperation == nil, symbol == "x²" {
+                        let tempDescription = "(\(description))"
+                        let powerSign = String(symbol.last!)
+                        description = tempDescription
+                        description.insert(contentsOf: powerSign, at: description.endIndex)
+                    } else if pendingBinaryOperation != nil, symbol != "x²" {
+                        if let numbersToOffset = description.components(separatedBy: ["+", "-", "×", "÷"]).last?.count {
+                            description.insert(contentsOf: symbol, at: description.index(description.endIndex, offsetBy: -numbersToOffset))
+                        }
+                    } else if pendingBinaryOperation != nil, symbol == "x²" {
+                        let powerSign = String(symbol.last!)
+                        description.insert(contentsOf: powerSign, at: description.endIndex)
+                    }
                 }
             case .binaryOperation(let function):
                 if accumulator != nil {
@@ -90,9 +106,9 @@ struct CalculatorBrain {
         }
     }
     
-    private var pendingBinaryOperation: PendingBinaryOperation?
+    var pendingBinaryOperation: PendingBinaryOperation?
     
-    private struct PendingBinaryOperation {
+    struct PendingBinaryOperation {
         let function: (Double, Double) -> Double
         let firstOperand: Double
         

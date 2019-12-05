@@ -12,6 +12,7 @@ class ViewController: UIViewController {
     
     
     @IBOutlet weak var display: UILabel!
+    @IBOutlet weak var loggingDisplay: UILabel!
     
     var userIsInTheMiddleOfTyping = false
     
@@ -24,6 +25,15 @@ class ViewController: UIViewController {
             if !(display.text?.contains("."))! || digit != "." {
                 display.text = textCurrentlyInDisplay + digit
             }
+        }
+        getDescriptionForLoggingDisplay()
+    }
+    
+    private func getDescriptionForLoggingDisplay() {
+        if brain.pendingBinaryOperation == nil {
+            loggingDisplay.text = "\(brain.description)="
+        } else if brain.pendingBinaryOperation != nil {
+            loggingDisplay.text = "\(brain.description)..."
         }
     }
     
@@ -47,6 +57,8 @@ class ViewController: UIViewController {
             displayValue = 0
             brain.result = nil
             brain.accumulator = nil
+            brain.description = ""
+            brain.pendingBinaryOperation = nil
         }
         if userIsInTheMiddleOfTyping {
             brain.setOperand(displayValue)
@@ -58,7 +70,7 @@ class ViewController: UIViewController {
         if let result = brain.result {
             displayValue = result
         }
-        
+        getDescriptionForLoggingDisplay()
     }
     
 }
